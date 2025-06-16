@@ -1,0 +1,20 @@
+Anotações PI Tamp Colector
+
+- O pino DT do hx711 serve para que a célula de carga envie os dados para o ESP32
+
+- O pino SCK serve para que o ESP32 envie dados para configuração da celula de carga
+
+- Ao medir a tensão entre A- e A+, os mv apresentados no multimetro se refere ao peso colocado sobre a balança, a principio quando não ter nada deve estar zero ou proximo disso. Caso colocado peso, o valor dos mv deverá subir, porém os valores só devem ter uma precisão considerável a partir de 1,1mv devemos fazer os testes e ver quantos g de tara serão necessário pra chegar a essa tensão
+
+- O erro "nam" no código calibration, está relacionado ao problema no pino do SCK
+
+- Como o erro no código tampcolector de alta variação, representa a falta de envio de dados do ESP32 para célula de carga, fazendo assim com que só a celula envie dados variados
+Mais informações: https://forum.arduino.cc/t/2-load-cells-half-wheatstone-bridge-hx711-esp32-works-but-faulty-measurements/1221461/7
+
+- Importante ressaltar que o código "calibration" não é um código muito, bom e aparenta apresentar vários problemas
+
+- Para testar o E+ E-, basta medir a tensão entre eles e ver se chega próximo ou a 5v ou a 3,3v
+
+- Para testar o DT, meça a tensão entre ele o GND, o valor deve ficar pulando entre 0 a 5/3,3v
+
+- Para testar o SCK, meça a tensão entre ele o GND, o valor deve ficar pulando entre 0 a 5/3,3v
