@@ -36,7 +36,7 @@ const int PINO_SENSOR_IR = 33; // Pino do seu código do sensor IR
 // ##  IMPORTANTE: Insira aqui o valor que você obteve com o script ##
 // ##  de calibração.                                               ##
 // ###################################################################
-const float FATOR_DE_CALIBRACAO = -275.315; // EXEMPLO! SUBSTITUA PELO SEU VALOR!
+const float FATOR_DE_CALIBRACAO = -275.316; // EXEMPLO! SUBSTITUA PELO SEU VALOR!
 
 // Defina o peso máximo em gramas que o recipiente suporta
 const float PESO_MAXIMO_GRAMAS = 4500.0; // Ex: Meio quilo
