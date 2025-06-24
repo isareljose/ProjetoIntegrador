@@ -72,7 +72,7 @@ void loop() {
   delay(1000);
   scale.power_up();
 
-  SerialBT.println(a);
-  a = 0;
-  delay (100);
+  //SerialBT.println(a);
+  //a = 0;
+  //delay (100);
 }

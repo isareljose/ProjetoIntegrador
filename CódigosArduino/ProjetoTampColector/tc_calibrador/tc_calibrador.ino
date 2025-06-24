@@ -11,7 +11,7 @@
 
 // Calibrating the load cell
 #include <Arduino.h>
-#include "soc/rtc.h"
+//#include "soc/rtc.h"
 #include "HX711.h"
 
 // HX711 circuit wiring
