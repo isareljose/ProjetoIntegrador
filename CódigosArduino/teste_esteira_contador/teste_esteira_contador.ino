@@ -20,15 +20,15 @@ const int PINO_HX711_SCK = 4;
 const int PINO_SENSOR_IR = 33;
 
 // --- PINOS DO MOTOR DA ESTEIRA ---
-const int PINO_MOTOR_STEP = 26;
+const int PINO_MOTOR_STEP = 25;
 const int PINO_MOTOR_DIR = 27;
 const int PINO_MOTOR_ENABLE = 14;
 
 // --- PARÂMETROS ---
 const float FATOR_DE_CALIBRACAO = -275.316;
 const float PESO_MAXIMO_GRAMAS = 4500.0;
-const int DEBOUNCE_DELAY_MS = 300;
-const int VELOCIDADE_ESTEIRA = 400;
+const int DEBOUNCE_DELAY_MS = 200;
+const int VELOCIDADE_ESTEIRA = 1000;
 
 // --- OBJETOS GLOBAIS ---
 HX711 scale;
@@ -62,7 +62,7 @@ void setup() {
   esteira.setEnablePin(PINO_MOTOR_ENABLE);
   esteira.setPinsInverted(false, false, true);
   esteira.setMaxSpeed(1000);
-  esteira.setAcceleration(500);
+  esteira.setAcceleration(300);
   esteira.setSpeed(0);
   Serial.println("Esteira inicializada.");
 
