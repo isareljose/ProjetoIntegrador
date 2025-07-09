@@ -29,7 +29,7 @@ const int PINO_MOTOR_ENABLE = 14;
 
 // --- PARÂMETROS ---
 const float FATOR_DE_CALIBRACAO = -275.316;
-const float PESO_MAXIMO_GRAMAS = 4500.0;
+const float PESO_MAXIMO_GRAMAS = 1000.0;
 const int DEBOUNCE_DELAY_MS = 200;
 const int VELOCIDADE_ESTEIRA = 1500;
 const int ACELERACAO_ESTEIRA = 300;
@@ -44,7 +44,7 @@ volatile EstadoProjetor estadoAtual = AGUARDANDO; // Volatile pois será acessad
 
 // --- VARIÁVEIS GLOBAIS ---
 unsigned long ultimoCheckComando = 0;
-const long INTERVALO_CHECK_COMANDO = 1500; // Checa por um comando a cada 1.5 segundos
+const long INTERVALO_CHECK_COMANDO = 300; // Checa por um comando a cada 1.5 segundos
 volatile int contadorTampinhas = 0; // Volatile
 volatile unsigned long ultimoTempoDeteccao = 0; // Volatile
 volatile float pesoAtual = 0; // Volatile
@@ -73,9 +73,11 @@ void TarefasSecundarias(void *pvParameters) {
       ultimoCheckComando = millis();
       Serial.println("[NUCLEO 0] Checando comando no Firebase...");
 
-      if (Firebase.getBool("controle/iniciarEsteira")) {
-        bool comandoRecebido = Firebase.getBool("controle/iniciarEsteira");
+      bool comandoRecebido = Firebase.getBool("controle/iniciarEsteira");
 
+      if (Firebase.failed()) {
+        Serial.println("[NUCLEO 0] Erro ao obter controle/iniciarEsteira.");
+      } else {
         if (comandoRecebido && estadoAtual == AGUARDANDO) {
           Serial.println("[NUCLEO 0] COMANDO RECEBIDO: INICIAR ESTEIRA");
           estadoAtual = PREPARANDO_TARA;
@@ -86,8 +88,6 @@ void TarefasSecundarias(void *pvParameters) {
           esteira.disableOutputs();
           estadoAtual = AGUARDANDO;
         }
-      } else {
-        Serial.println("[NUCLEO 0] Firebase.getBool falhou");
       }
     }
 
@@ -121,6 +121,13 @@ void TarefasSecundarias(void *pvParameters) {
       }
     }
 
+    // --- SINCRONIZAR contadorTampinhas com Firebase (independente do estado) ---
+    int valorFirebase = Firebase.getInt("tampas/count");
+    if (!Firebase.failed() && valorFirebase == 0 && contadorTampinhas != 0) {
+      Serial.println("[NUCLEO 0] Firebase foi zerado, zerando contador local.");
+      contadorTampinhas = 0;
+    }
+
     delay(100); // Evita sobrecarregar o núcleo
   }
 }
@@ -149,6 +156,7 @@ void setup() {
     delay(500);
   }
   Serial.println("\nConectado! IP: " + WiFi.localIP().toString());
+  Firebase.setBool("status/wifiConectado", true);
   
   // --- FIREBASE ---
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
@@ -159,7 +167,7 @@ void setup() {
   Serial.println("\nSistema pronto. Em modo AGUARDANDO.");
 
   // --- CRIAÇÃO DA TAREFA SECUNDÁRIA NO NÚCLEO 0 ---
-  xTaskCreatePinnedToCore(
+  xTaskCreatePinnedToCore(a
     TarefasSecundarias,   // Função que a tarefa vai executar
     "TarefasSecundarias", // Nome da tarefa
     10000,                // Tamanho da pilha (stack size)
@@ -190,6 +198,12 @@ void setup() {
 // ---           LOOP PRINCIPAL - Roda no Núcleo 1                 ---
 // ===================================================================
 void loop() {
+  static unsigned long ultimaVerificacao = 0;
+  if (millis() - ultimaVerificacao >= 5000) { // a cada 5s
+    ultimaVerificacao = millis();
+    bool conectado = WiFi.status() == WL_CONNECTED;
+    Firebase.setBool("status/wifiConectado", conectado);
+  }
   switch (estadoAtual) {
     case AGUARDANDO:
       if (Serial.available() > 0) {
