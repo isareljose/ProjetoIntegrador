@@ -240,7 +240,6 @@ void loop() {
       break;
 
     case CONTANDO:
-      // A ÚNICA TAREFA DESTE NÚCLEO AGORA É GARANTIR O MOVIMENTO FLUIDO.
       esteira.runSpeed();
       break;
 
@@ -254,7 +253,7 @@ void loop() {
       break;
 
     case FINALIZANDO:
-      if (millis() - tempoInicioPausa >= 2500) { // Aumentei um pouco para dar tempo do ultimo reporte do firebase
+      if (millis() - tempoInicioPausa >= 2500) {
         Serial.println("Sistema voltando para o modo AGUARDANDO.");
         estadoAtual = AGUARDANDO;
       }
